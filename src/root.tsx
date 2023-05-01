@@ -26,23 +26,14 @@ import { supabase } from '~/components/supabaseClient'
 import { AuthSession } from '@supabase/supabase-js'
 import Account from '~/components/Account'
 import Auth from '~/components/Auth'
+import AuthProvider from '~/components/AuthContext'
+import useAuth from '~/components/AuthContext'
 import EntityList from "./components/EntityList";
 import "./root.css";
 
 export default function Root() {
-
-    const [session, setSession] = createSignal<AuthSession | null>(null);
-    
-  createEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => { 
-      setSession(session)
-    })
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-  })
-
+  const [session] = useAuth();
+  
   const [entities, setEntities] = createSignal<Entity[] | null>
   const [currentEntity, setCurrentEntity] = createSignal<Entity | null>(null);
   createEffect(()=>{
@@ -55,6 +46,7 @@ export default function Root() {
   }
   
   return (
+    <AuthProvider>
     <Html lang="en">
       <Head>
         <Title>SolidStart - Bare</Title>
@@ -76,5 +68,6 @@ export default function Root() {
         <Scripts />
       </Body>
       </Html>
-  );
+    <AuthProvider>
+      );
 }
