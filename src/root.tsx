@@ -1,8 +1,9 @@
+const mySecret = process.env['VITE_SUPABASE_URL']
 type Entity = {
     id: number,
     name: string,
     owner_id: string,
-    created_ad: string,
+    created_at: string,
     type: string,
     address: string,
     additional_data: object
@@ -40,11 +41,19 @@ export default function Root() {
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })
-
   })
 
+  const [entities, setEntities] = createSignal<Entity[] | null>
   const [currentEntity, setCurrentEntity] = createSignal<Entity | null>(null);
+  createEffect(()=>{
+    getUserEntities()
+  }) 
 
+  async function getUserEntities(){
+  const {data} = await supabase.from("entity").select();
+    setEntities(data);
+  }
+  
   return (
     <Html lang="en">
       <Head>
@@ -58,7 +67,7 @@ export default function Root() {
             <div class="container" style={{ padding: '50px 0 100px 0' }}>
                 {!session() ? <Auth /> : <Account session={session()!} />}
             </div>
-            <EntityList entities={[] as Entity[]} setEntity={setCurrentEntity} currentEntity={currentEntity} />
+            <EntityList entities={entities()} setEntity={setCurrentEntity} currentEntity={currentEntity()} />
             <Routes>
               <FileRoutes />
             </Routes>

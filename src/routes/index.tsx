@@ -4,8 +4,8 @@ import { supabase } from '~/components/supabaseClient'
 import { AuthSession } from '@supabase/supabase-js'
 import { createSignal } from "solid-js";
 
-export default function Home(session:AuthSession) {
-  const [currentEntity, setCurrentEntity] = createSignal<{id: string|null, type:string|null}>({id:null, type:null})
+export default function Home() {
+  
 
   return (
     <main>
