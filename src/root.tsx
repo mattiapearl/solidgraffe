@@ -26,23 +26,22 @@ import { supabase } from '~/components/supabaseClient'
 import { AuthSession } from '@supabase/supabase-js'
 import Account from '~/components/Account'
 import Auth from '~/components/Auth'
-import AuthProvider from '~/components/AuthContext'
-import useAuth from '~/components/AuthContext'
+import {AuthProvider, useAuth} from '~/components/AuthContext'
 import EntityList from "./components/EntityList";
 import "./root.css";
 
 export default function Root() {
   const [session] = useAuth();
   
-  const [entities, setEntities] = createSignal<Entity[] | null>
+  const [entities, setEntities] = createSignal<Entity[] | null[]>([])
   const [currentEntity, setCurrentEntity] = createSignal<Entity | null>(null);
   createEffect(()=>{
     getUserEntities()
   }) 
 
   async function getUserEntities(){
-  const {data} = await supabase.from("entity").select();
-    setEntities(data);
+  const {data} = await supabase.from("entity").select() ;
+    setEntities(data as Entity[]);
   }
   
   return (
@@ -59,7 +58,7 @@ export default function Root() {
             <div class="container" style={{ padding: '50px 0 100px 0' }}>
                 {!session() ? <Auth /> : <Account session={session()!} />}
             </div>
-            <EntityList entities={entities()} setEntity={setCurrentEntity} currentEntity={currentEntity()} />
+            <EntityList entities={entities() == null ? []: entities()} setEntity={setCurrentEntity} currentEntity={currentEntity()} />
             <Routes>
               <FileRoutes />
             </Routes>
@@ -68,6 +67,6 @@ export default function Root() {
         <Scripts />
       </Body>
       </Html>
-    <AuthProvider>
+    </AuthProvider>
       );
 }

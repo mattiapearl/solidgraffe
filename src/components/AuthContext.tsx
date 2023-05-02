@@ -1,16 +1,17 @@
-import { createSignal, createContext, useContext } from "solid-js";
+import { createSignal, createContext, createEffect, useContext } from "solid-js";
 import { supabase } from '~/components/supabaseClient'
 import { AuthSession } from '@supabase/supabase-js'
-import Account from '~/components/Account'
-import Auth from '~/components/Auth'
 
 const AuthContext = createContext();
 
-export function AuthProvider(props) {
-   const [session, setSession] = createSignal<AuthSession | null>(null);
-    
+export function AuthProvider(props: any) {
+  const [session, setSession] = createSignal<AuthSession | null>(null),
+    store = [
+      session
+    ];
+
   createEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => { 
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
     })
 
@@ -18,9 +19,6 @@ export function AuthProvider(props) {
       setSession(session)
     })
   })
-    store = [
-      session
-    ];
 
   return (
     <AuthContext.Provider value={store}>
